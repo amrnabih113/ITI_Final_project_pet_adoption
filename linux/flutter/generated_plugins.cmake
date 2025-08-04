@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  native_splash_screen_linux
   url_launcher_linux
 )
 

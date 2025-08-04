@@ -6,7 +6,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   firebase_auth
   firebase_core
-  native_splash_screen_windows
   url_launcher_windows
 )
 

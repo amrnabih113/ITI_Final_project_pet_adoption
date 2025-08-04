@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pet_adoption/ui/screens/auth/login.dart';
 
 class OnboardingController extends GetxController {
   static OnboardingController get instance => Get.find();
@@ -21,6 +22,8 @@ class OnboardingController extends GetxController {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+    } else {
+      Get.to(() => const Login());
     }
   }
 
