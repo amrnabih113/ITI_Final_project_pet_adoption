@@ -6,26 +6,43 @@ A modern Flutter app that helps users discover and adopt pets from nearby shelte
 
 ## ✨ Key Features
 
-* 📱 **Onboarding Flow** – Engage users with an elegant 3-screen introduction
-* 🔐 **Authentication** – Secure login & signup using Firebase Auth + Google Sign-In
-* 🐶 **Pet Listings** – Browse available pets with photos, filters, and shelter details
-* ❤️ **Favorites** – Save pets to revisit later
-* 🛍️ **Bottom Navigation** – Navigate smoothly between core app sections
-* 🔄 **Real-Time Updates** – Instantly reflect changes from Firebase Firestore
+✅ Features
+🟢 Splash Screen – Initial loader and setup
 
+📱 Onboarding + Firebase Login / Signup
+
+🔐 Authentication – Secure login using Firebase Auth + Google Sign-In
+
+🐶 Pet Listings – Browse available pets with images, filters, and shelter details
+
+❤️ Favorites – Save pets you love to revisit later
+
+📝 Add a Pet – Post a pet for adoption
+
+🧠 Real-Time Updates – Instantly reflect changes using Firebase Firestore
+
+🛍️ Bottom Navigation – Smooth navigation across the app
+
+👤 User Profile – View and edit profile information
+
+🌓 Dark & Light Theme – Automatically adapt to system theme
+
+🎨 Clean UI – Minimal, modern, and responsive
+
+⚡ Fast UX – Powered by GetX for high performance
 ---
 
-## 💠 Tech Stack
+## 🧱 Tech Stack
 
-* **Flutter** (v3.8.1)
-* **Dart** (null safety enabled)
-* **Firebase**
+| Technology   | Purpose                      |
+|--------------|------------------------------|
+| Flutter      | UI framework                 |
+| GetX         | State management & routing   |
+| Firebase     | Auth & backend (Cloud Firestore) |
+| Iconsax      | Beautiful icons              |
+| Carousel Slider | Image carousels           |
+| CachedNetworkImage | Image optimization     |
 
-  * Authentication
-  * Firestore
-  * Storage
-* **State Management**: GetX
-* **Design**: Material Design 3
 
 ---
 
@@ -49,11 +66,14 @@ A warm, pet-friendly color palette designed for accessibility and brand identity
 
 ```dart
 class MyColors {
-  static const Color primaryColor   = Color(0xFFED6A5A);
-  static const Color background    = Color(0xFFFDF6EC);
-  static const Color textPrimary   = Color(0xFF222222);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color accent        = Color(0xFF91C788);
+ // App basic Colors
+  static const Color primaryColor = Color(0xFFFFA726); // Warm Orange
+  static const Color secondaryColor = Color(0xFF81D4FA); // Sky Blue
+  static const Color accent = Color(0xFFAED581); // Mint Green
+  static const Color darker = Color(0xFF616161); // Slate Gray
+  static const Color buttonDark = Color(0xFF4F4F4F); // Darker Neutral
+  static const Color buttonLight = Color(0xFFF4F4F4); // Light Grey
+  static const Color selectedButton = Color(0xFFCE93D8); // Lilac Accent
 }
 ```
 
@@ -76,14 +96,27 @@ flutter pub get
 
 ```yaml
 dependencies:
+  build_runner: ^2.6.0
+  carousel_slider: ^5.1.1
+  connectivity_plus: ^6.1.4
+  cupertino_icons: ^1.0.8
+  firebase_auth: ^6.0.0
+  firebase_core: ^4.0.0
   flutter:
-  get: ^4.6.6
-  firebase_core: ^2.0.0
-  firebase_auth: ^4.0.0
-  cloud_firestore: ^4.0.0
-  firebase_storage: ^11.0.0
-  google_sign_in: ^6.0.0
-  flutter_svg: ^2.0.7
+    sdk: flutter
+  flutter_native_splash: ^2.4.6
+  get: ^4.7.2
+  get_storage: ^2.1.1
+  getx_test: ^1.0.3
+  google_fonts: ^6.3.0
+  google_sign_in: ^6.2.2
+  iconsax: ^0.0.8
+  intl: ^0.20.2
+  logger: ^2.6.1
+  lottie: ^3.3.1
+  shimmer: ^3.0.0
+  url_launcher: ^6.3.2
+  
 ```
 
 ---
