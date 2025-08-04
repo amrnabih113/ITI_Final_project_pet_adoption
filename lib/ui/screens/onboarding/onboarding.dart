@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pet_adoption/controllers/onboarding_controller.dart';
+import 'package:pet_adoption/controllers/onboarding/onboarding_controller.dart';
 import 'package:pet_adoption/models/onboarding_model.dart';
 
 import '../../../core/constants/colors.dart'; // Assuming you have a color file

@@ -1,7 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/ui/widgets/categories_list.dart';
 import 'package:pet_adoption/ui/widgets/my_body.dart';
 import 'package:pet_adoption/ui/widgets/my_header_title.dart';
@@ -86,6 +84,7 @@ class Home extends StatelessWidget {
                 itemCount: 5,
                 itemBuilder: (context, index) {
                   return PetCard(
+                    
                     name: "Rocky",
                     age: "2 months",
                     breed: "Golden Retriever",

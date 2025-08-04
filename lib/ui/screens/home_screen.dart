@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -41,8 +41,8 @@ class HomeScreen extends StatelessWidget {
               indicatorShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              indicatorColor: MyColors.primaryColor.withOpacity(
-                0.15,
+              indicatorColor: MyColors.primaryColor.withValues(
+                alpha: 0.15,
               ), // translucent base
               labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               destinations: const [
