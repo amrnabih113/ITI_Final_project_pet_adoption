@@ -4,6 +4,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
 import 'package:pet_adoption/ui/screens/pets/home.dart';
+import 'package:pet_adoption/ui/screens/profile/profile.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -88,8 +89,9 @@ class NavigationController extends GetxController {
 
   final List<Widget> screens = [
     Home(),
-    Container(color: Colors.blue),
+
     Container(color: Colors.yellow),
     Container(color: Colors.green),
+    Profile(),
   ];
 }

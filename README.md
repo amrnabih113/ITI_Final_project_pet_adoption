@@ -7,6 +7,7 @@ A modern Flutter app that helps users discover and adopt pets from nearby shelte
 ## ✨ Key Features
 
 ✅ Features
+
 🟢 Splash Screen – Initial loader and setup
 
 📱 Onboarding + Firebase Login / Signup

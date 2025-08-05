@@ -50,7 +50,7 @@ class Onboarding extends StatelessWidget {
               },
             ),
           ),
-          
+
           Positioned(
             bottom: 50,
             left: 50,
@@ -83,9 +83,14 @@ class Onboarding extends StatelessWidget {
                 right: 30,
                 child: Align(
                   alignment: Alignment.bottomRight,
-                  child: OutlinedButton(
+                  child: TextButton(
                     onPressed: () => controller.skip(),
-                    child: const Text('Skip'),
+                    child: Text(
+                      'Skip',
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        color: MyColors.primaryColor,
+                      ),
+                    ),
                   ),
                 ),
               );
