@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
+import 'package:pet_adoption/ui/screens/pets/explore.dart';
 import 'package:pet_adoption/ui/widgets/categories_list.dart';
 import 'package:pet_adoption/ui/widgets/my_body.dart';
 import 'package:pet_adoption/ui/widgets/my_header_title.dart';
@@ -68,7 +69,7 @@ class _BottomSheetContent extends StatelessWidget {
               ),
             ],
           ),
-          child: const SingleChildScrollView(
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -78,7 +79,7 @@ class _BottomSheetContent extends StatelessWidget {
                 MyHeaderTitle(title: "Categories", showSeeAll: false),
                 _CategorySection(),
                 SizedBox(height: 20),
-                MyHeaderTitle(title: "Recommended for you", showSeeAll: true),
+                MyHeaderTitle(title: "Recommended for you", showSeeAll: false),
                 SizedBox(height: 10),
                 _RecommendedPetsGrid(),
               ],

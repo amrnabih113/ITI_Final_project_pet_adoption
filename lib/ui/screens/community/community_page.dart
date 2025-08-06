@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 
 class CommunityPage extends StatelessWidget {
@@ -31,30 +32,33 @@ class CommunityPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: MyColors.light,
       appBar: AppBar(
         toolbarHeight: 70,
         shape: UnderlineInputBorder(
           borderSide: BorderSide(color: MyColors.primaryColor),
           borderRadius: BorderRadius.circular(40),
         ),
-        backgroundColor: MyColors.light,
-        elevation: 0.5,
-        title: Text(
-          'Petstagram',
-          style: GoogleFonts.pacifico(
-            fontSize: 26,
-            color: MyColors.primaryColor,
-          ),
+        title: Row(
+          spacing: 4,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Petstagram',
+              style: GoogleFonts.pacifico(
+                fontSize: 26,
+                color: MyColors.primaryColor,
+              ),
+            ),
+            Icon(Iconsax.instagram, color: MyColors.textPrimary),
+          ],
         ),
         centerTitle: true,
+        actionsPadding: const EdgeInsets.only(right: 10),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 10.0),
-            child: IconButton(
-              icon: Icon(Icons.send_outlined, color: Colors.black),
-              onPressed: () {},
-            ),
+          IconButton(
+            icon: Icon(Icons.send_outlined, color: Colors.black),
+            onPressed: () {},
           ),
         ],
       ),
