@@ -112,12 +112,17 @@ class MyColors {
   static const Color textWhite = Colors.white;
 
   // Background Colors
-  static const Color light = Color(0xFFF9ECC3); // Creamy Beige
+  static const Color light = const Color.fromARGB(
+    255,
+    255,
+    250,
+    240,
+  ); // Creamy Beige
   static const Color dark = Color(0xFF232323);
   static const Color primaryBackground = Color(0xFFF9F9F9);
 
   // Container Backgrounds
-  static const Color lightContainer = Color.fromARGB(255, 255, 220, 149);
+  static const Color lightContainer = Color(0xFFF9ECC3);
   static Color darkContainer = const Color(0xFF171E2D);
 
   // Button Colors

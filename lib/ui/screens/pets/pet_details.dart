@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/ui/widgets/Pet_section_title.dart';
+import 'package:pet_adoption/ui/widgets/icon_button_widget.dart';
 import 'package:pet_adoption/ui/widgets/pet_info_ship.dart';
 
 class PetDetails extends StatelessWidget {
@@ -119,12 +120,12 @@ class PetDetails extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _iconButton(
+                  IconButtonWidget(
                     iconColor: MyColors.primaryColor,
                     icon: Icons.arrow_back,
                     onTap: () => Navigator.pop(context),
                   ),
-                  _iconButton(
+                  IconButtonWidget(
                     icon: Iconsax.heart,
                     iconColor: MyColors.primaryColor,
                     onTap: () {},
@@ -137,21 +138,6 @@ class PetDetails extends StatelessWidget {
       ),
     );
   }
-}
-
-// Reusable Icon Button
-Widget _iconButton({
-  required IconData icon,
-  Color iconColor = Colors.black,
-  required VoidCallback onTap,
-}) {
-  return CircleAvatar(
-    backgroundColor: Colors.white,
-    child: IconButton(
-      icon: Icon(icon, color: iconColor),
-      onPressed: onTap,
-    ),
-  );
 }
 
 class CharacteristicsSection extends StatelessWidget {

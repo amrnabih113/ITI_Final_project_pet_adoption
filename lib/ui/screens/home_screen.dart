@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
-import 'package:pet_adoption/ui/screens/pets/home.dart';
+import 'package:pet_adoption/ui/screens/community/community_page.dart';
+import 'package:pet_adoption/ui/screens/pets/favourates.dart';
+import 'package:pet_adoption/ui/screens/pets/home_page.dart';
 import 'package:pet_adoption/ui/screens/profile/profile.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -26,9 +28,16 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: const Offset(0, -8),
                 ),
               ],
             ),
@@ -52,11 +61,8 @@ class HomeScreen extends StatelessWidget {
                   label: "Home",
                 ),
                 NavigationDestination(
-                  icon: Icon(
-                    Iconsax.search_normal_1,
-                    color: MyColors.primaryColor,
-                  ),
-                  label: "Explore",
+                  icon: Icon(Iconsax.instagram, color: MyColors.primaryColor),
+                  label: "Community",
                 ),
                 NavigationDestination(
                   icon: Icon(Iconsax.heart, color: MyColors.primaryColor),
@@ -89,9 +95,8 @@ class NavigationController extends GetxController {
 
   final List<Widget> screens = [
     Home(),
-
-    Container(color: Colors.yellow),
-    Container(color: Colors.green),
+    CommunityPage(),
+    FavoritesPage(),
     Profile(),
   ];
 }

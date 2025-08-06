@@ -138,18 +138,18 @@ final List<OnboardingModel> onboardingData = [
     title: 'Find Your New Best Friend',
     description:
         'Discover loving cats, dogs, and other adorable companions waiting for a forever home. Your next best friend is just a tap away!',
-    image: 'assets/images/onboarding1.png',
+    image: 'assets/images/onboarding_images/onboarding11.png',
   ),
   OnboardingModel(
     title: 'Adopt with Just a Few Clicks',
     description:
         'Browse, apply, and adopt — all from your phone. We’ve made the process simple, secure, and stress-free for both you and the pets.',
-    image: 'assets/images/onboarding2.png',
+    image: 'assets/images/onboarding_images/onboarding22.png',
   ),
   OnboardingModel(
     title: 'Support Local Shelters',
     description:
         'By adopting through our app, you’re supporting local animal shelters and giving pets the second chance they deserve.',
-    image: 'assets/images/onboarding3.png',
+    image: 'assets/images/onboarding_images/onboarding33.png',
   ),
 ];

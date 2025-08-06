@@ -74,7 +74,7 @@ class _ProfileState extends State<Profile> {
           height: MyHelperFunctions.getScreenHeight() * 0.76,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 255, 250, 240),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.05),
