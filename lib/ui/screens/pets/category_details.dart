@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
-import 'package:pet_adoption/ui/screens/pets/favourates.dart';
+import 'package:pet_adoption/ui/widgets/horizontal_pet_card.dart';
 import 'package:pet_adoption/ui/widgets/my_header_title.dart';
 import 'package:pet_adoption/ui/widgets/pet_card.dart';
 

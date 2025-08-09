@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
-import 'package:pet_adoption/ui/screens/pets/explore.dart';
 import 'package:pet_adoption/ui/widgets/categories_list.dart';
 import 'package:pet_adoption/ui/widgets/my_body.dart';
 import 'package:pet_adoption/ui/widgets/my_header_title.dart';

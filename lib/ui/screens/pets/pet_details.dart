@@ -67,11 +67,21 @@ class PetDetails extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
+                const SizedBox(height: 20),
                 // Health
                 SectionTitle(title: "Health", icon: Iconsax.health),
                 const SizedBox(height: 6),
-                const Text("• Fully vaccinated"),
-                const Text("• Neutered"),
+                Row(
+                  children: [
+                    const Icon(
+                      Iconsax.shield_tick,
+                      size: 18,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(width: 5),
+                    Text("Vaccinated", style: TextStyle(color: Colors.green)),
+                  ],
+                ),
 
                 const SizedBox(height: 20),
                 const CharacteristicsSection(
@@ -91,9 +101,12 @@ class PetDetails extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {},
-                    child: const Text(
+                    child: Text(
                       "Adopt Me",
-                      style: TextStyle(fontSize: 16),
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

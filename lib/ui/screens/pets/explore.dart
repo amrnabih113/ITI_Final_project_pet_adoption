@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
+import 'package:pet_adoption/ui/widgets/filter_chip_widget.dart';
 import 'package:pet_adoption/ui/widgets/my_search_bar.dart';
 import 'package:pet_adoption/ui/widgets/pet_card.dart';
 
@@ -124,35 +125,35 @@ class _ExploreState extends State<Explore> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _buildFilterChip(
-                    "All",
-                    selectedSpecies,
-                    (val) => setState(() => selectedSpecies = val),
+                  FilterChipWidget(
+                    label: "All",
+                    selected: selectedSpecies,
+                    onSelected: (val) => setState(() => selectedSpecies = val),
                   ),
-                  _buildFilterChip(
-                    "Dogs",
-                    selectedSpecies,
-                    (val) => setState(() => selectedSpecies = val),
+                  FilterChipWidget(
+                    label: "Dogs",
+                    selected: selectedSpecies,
+                    onSelected: (val) => setState(() => selectedSpecies = val),
                   ),
-                  _buildFilterChip(
-                    "Cats",
-                    selectedSpecies,
-                    (val) => setState(() => selectedSpecies = val),
+                  FilterChipWidget(
+                    label: "Cats",
+                    selected: selectedSpecies,
+                    onSelected: (val) => setState(() => selectedSpecies = val),
                   ),
-                  _buildFilterChip(
-                    "Birds",
-                    selectedSpecies,
-                    (val) => setState(() => selectedSpecies = val),
+                  FilterChipWidget(
+                    label: "Birds",
+                    selected: selectedSpecies,
+                    onSelected: (val) => setState(() => selectedSpecies = val),
                   ),
-                  _buildFilterChip(
-                    "Rabbits",
-                    selectedSpecies,
-                    (val) => setState(() => selectedSpecies = val),
+                  FilterChipWidget(
+                    label: "Rabbits",
+                    selected: selectedSpecies,
+                    onSelected: (val) => setState(() => selectedSpecies = val),
                   ),
-                  _buildFilterChip(
-                    "Turtles",
-                    selectedSpecies,
-                    (val) => setState(() => selectedSpecies = val),
+                  FilterChipWidget(
+                    label: "Turtles",
+                    selected: selectedSpecies,
+                    onSelected: (val) => setState(() => selectedSpecies = val),
                   ),
                 ],
               ),
@@ -161,14 +162,26 @@ class _ExploreState extends State<Explore> {
             Row(
               children: [
                 const Text("Gender: "),
+
                 DropdownButton<String>(
+                  dropdownColor: MyColors.light,
+
+                  borderRadius: BorderRadius.circular(20),
+                  iconEnabledColor: MyColors.primaryColor,
                   value: selectedGender,
                   onChanged: (value) => setState(() => selectedGender = value!),
                   items: ["All", "Male", "Female"]
                       .map(
                         (gender) => DropdownMenuItem(
                           value: gender,
-                          child: Text(gender),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: Text(
+                              gender,
+                              style: Theme.of(context).textTheme.bodyLarge!
+                                  .copyWith(fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ),
                       )
                       .toList(),
@@ -215,31 +228,6 @@ class _ExploreState extends State<Explore> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(
-    String label,
-    String selected,
-    Function(String) onSelected,
-  ) {
-    final isSelected = label == selected;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (_) => onSelected(label),
-        selectedColor: MyColors.primaryColor.withValues(alpha: 0.2),
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(color: MyColors.primaryColor),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        labelStyle: TextStyle(
-          color: isSelected ? MyColors.primaryColor : MyColors.textPrimary,
         ),
       ),
     );
