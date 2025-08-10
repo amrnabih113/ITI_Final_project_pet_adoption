@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pet_adoption/services/auth_service.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:pet_adoption/core/constants/colors.dart';
 
 class MyHomeAppBar extends StatelessWidget {
   const MyHomeAppBar({super.key});
@@ -33,8 +34,18 @@ class MyHomeAppBar extends StatelessWidget {
         ),
         const Spacer(),
         IconButton(
-          onPressed: () => AuthService.instance.signOut(),
-          icon: const Icon(Icons.exit_to_app_rounded, color: Colors.black),
+          onPressed: () {},
+          icon: Badge(
+            alignment: Alignment.topRight,
+            backgroundColor: MyColors.primaryColor,
+            isLabelVisible: true,
+            label: Text('3'),
+            child: const Icon(
+              Iconsax.notification5,
+              size: 30,
+              color: Colors.black,
+            ),
+          ),
         ),
       ],
     );

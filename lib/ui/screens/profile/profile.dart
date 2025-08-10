@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
+import 'package:pet_adoption/services/auth_service.dart';
+import 'package:pet_adoption/ui/screens/pets/add_pet.dart';
+import 'package:pet_adoption/ui/screens/profile/edit_profile.dart';
 import 'package:pet_adoption/ui/widgets/my_body.dart';
 
 class Profile extends StatefulWidget {
@@ -16,120 +21,195 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MyHelperFunctions.getScreenHeight();
+
     return Scaffold(
       extendBody: true,
+      extendBodyBehindAppBar: true,
       body: Stack(
         children: [
           MyBody(
             image: "assets/images/background3.png",
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 24,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [_buildUserHeader()],
+                  children: [
+                    // Creative profile card with image + details + edit button
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          // Profile Image with subtle shadow & border
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: MyColors.primaryColor,
+                                width: 2,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              radius: 50,
+                              backgroundImage: const AssetImage(
+                                'assets/images/profile.png',
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 24),
+
+                          // User info + edit button stacked vertically
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Amr Nabih',
+                                  style: TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: MyColors.primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'amrnabih112@gmail.com',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: MyColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
+                                // Edit profile button - filled, rounded
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () =>
+                                        Get.to(() => const ProfilePage()),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: MyColors.primaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    icon: const Icon(Iconsax.edit_2, size: 18),
+                                    label: const Text(
+                                      'Edit Profile',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-          _buildBottomSheet(), // Wavy bottom sheet here
-        ],
-      ),
-    );
-  }
 
-  Widget _buildUserHeader() {
-    return Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.transparent,
-            backgroundImage: AssetImage('assets/images/profile.png'),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Amr Nabih',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'amrnabih112@gmail.com',
-            style: TextStyle(fontSize: 14, color: MyColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomSheet() {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: ClipPath(
-        clipper: TopWaveClipper(),
-        child: Container(
-          height: MyHelperFunctions.getScreenHeight() * 0.76,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 255, 250, 240),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                spreadRadius: 2,
+          // Wavy bottom sheet with settings
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: ClipPath(
+              clipper: TopWaveClipper(),
+              child: Container(
+                height: screenHeight * 0.76,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 40,
+                ),
+                decoration: BoxDecoration(color: MyColors.light),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildSettingsCard([
+                        _buildSettingTile(
+                          Iconsax.add_circle,
+                          "Add Pet",
+                          onTap: () => Get.to(() => const AddPetPage()),
+                        ),
+                        _buildSettingTile(
+                          Icons.calendar_month,
+                          "My Appointments",
+                        ),
+                        _buildSettingTile(Icons.pets_outlined, "My Pets"),
+                        _buildSwitchTile(
+                          Icons.notifications_outlined,
+                          "Notifications",
+                          notifications,
+                          (val) => setState(() => notifications = val),
+                        ),
+                        _buildSwitchTile(
+                          Icons.location_on_outlined,
+                          "Geolocation",
+                          geolocation,
+                          (val) => setState(() => geolocation = val),
+                        ),
+                      ]),
+                      const SizedBox(height: 16),
+                      _buildSettingsCard([
+                        _buildSettingTile(
+                          Icons.privacy_tip_outlined,
+                          "Settings & Privacy",
+                        ),
+                        _buildSettingTile(Icons.info_outline, "Developer Info"),
+                        _buildSettingTile(Icons.help_outline, "About Us"),
+                        _buildSettingTile(
+                          Icons.logout,
+                          "Log Out",
+                          isDestructive: true,
+                          onTap: () {
+                            AuthService.instance.signOut();
+                          },
+                        ),
+                      ]),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _settingsCard([
-                  _settingTile(Icons.edit_outlined, "Edit Profile"),
-                  _settingTile(Icons.calendar_month, "My Appointments"),
-                  _settingTile(Icons.pets_outlined, "My pets"),
-                  _switchTile(
-                    Icons.notifications_outlined,
-                    "Notifications",
-                    notifications,
-                    (val) {
-                      setState(() => notifications = val);
-                    },
-                  ),
-                  _switchTile(
-                    Icons.location_on_outlined,
-                    "Geolocation",
-                    geolocation,
-                    (val) {
-                      setState(() => geolocation = val);
-                    },
-                  ),
-                ]),
-                const SizedBox(height: 16),
-                _settingsCard([
-                  _settingTile(
-                    Icons.privacy_tip_outlined,
-                    "Settings & Privacy",
-                  ),
-                  _settingTile(Icons.info_outline, "Developer Info"),
-                  _settingTile(Icons.help_outline, "About Us"),
-                  _settingTile(Icons.logout, "Log Out", isDestructive: true),
-                ]),
-              ],
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
-  Widget _settingTile(
+  Widget _buildSettingsCard(List<Widget> children) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildSettingTile(
     IconData icon,
     String title, {
     bool isDestructive = false,
+    VoidCallback? onTap,
   }) {
     return ListTile(
       leading: Icon(
@@ -144,17 +224,15 @@ class _ProfileState extends State<Profile> {
         ),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: () {
-        // handle navigation here
-      },
+      onTap: onTap ?? () {},
     );
   }
 
-  Widget _switchTile(
+  Widget _buildSwitchTile(
     IconData icon,
     String title,
     bool value,
-    void Function(bool) onChanged,
+    ValueChanged<bool> onChanged,
   ) {
     return SwitchListTile(
       value: value,
@@ -169,17 +247,6 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
-
-  Widget _settingsCard(List<Widget> children) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(children: children),
-    );
-  }
 }
 
 class TopWaveClipper extends CustomClipper<Path> {
@@ -187,11 +254,10 @@ class TopWaveClipper extends CustomClipper<Path> {
   Path getClip(Size size) {
     final path = Path();
     path.lineTo(0, 40);
-    final firstControlPoint = Offset(size.width / 4, 0); // Y=0
-    final firstEndPoint = Offset(size.width / 2, 30); // Y=30
-
-    final secondControlPoint = Offset(size.width * 3 / 4, 60); // Y=60
-    final secondEndPoint = Offset(size.width, 40); // Y=40
+    final firstControlPoint = Offset(size.width / 4, 0);
+    final firstEndPoint = Offset(size.width / 2, 30);
+    final secondControlPoint = Offset(size.width * 3 / 4, 60);
+    final secondEndPoint = Offset(size.width, 40);
 
     path.quadraticBezierTo(
       firstControlPoint.dx,
@@ -209,6 +275,7 @@ class TopWaveClipper extends CustomClipper<Path> {
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
+
     return path;
   }
 

@@ -6,7 +6,7 @@ import 'package:pet_adoption/core/utils/helpers/network_manager.dart';
 import 'package:pet_adoption/core/utils/popups/full_screen_loader.dart';
 import 'package:pet_adoption/core/utils/popups/loaders.dart';
 import 'package:pet_adoption/services/auth_service.dart';
-import 'package:pet_adoption/ui/screens/home_screen.dart';
+import 'package:pet_adoption/ui/screens/navigation_menu.dart';
 
 class SigninController extends GetxController {
   Rx<TextEditingController> emailController = TextEditingController().obs;
@@ -74,7 +74,7 @@ class SigninController extends GetxController {
       );
       await authService.signInWithGoogle();
       MyFullScreenLoader.stopLoading();
-      Get.to(() => const HomeScreen());
+      AuthService.instance.screenRedirect();
     } catch (e) {
       MyLoaders.errorSnackBar(title: "Error", message: e.toString());
       MyFullScreenLoader.stopLoading();

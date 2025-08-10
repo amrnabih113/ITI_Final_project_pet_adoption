@@ -9,8 +9,8 @@
 // import 'package:pet_adoption/ui/screens/pets/home_page.dart';
 // import 'package:pet_adoption/ui/screens/profile/profile.dart';
 
-// class HomeScreen extends StatelessWidget {
-//   const HomeScreen({super.key});
+// class NavigationMenu extends StatelessWidget {
+//   const NavigationMenu({super.key});
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -102,14 +102,14 @@ import 'package:pet_adoption/ui/screens/pets/favourates.dart';
 import 'package:pet_adoption/ui/screens/pets/home_page.dart';
 import 'package:pet_adoption/ui/screens/profile/profile.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class NavigationMenu extends StatefulWidget {
+  const NavigationMenu({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<NavigationMenu> createState() => _NavigationMenuState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _NavigationMenuState extends State<NavigationMenu> {
   final _notchController = NotchBottomBarController(index: 0);
 
   @override

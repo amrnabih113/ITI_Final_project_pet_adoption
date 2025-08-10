@@ -1,8 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pet_adoption/core/constants/colors.dart';
 
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
+import 'package:pet_adoption/models/pets_model.dart';
+import 'package:pet_adoption/ui/screens/pets/search_page.dart';
 import 'package:pet_adoption/ui/widgets/categories_list.dart';
 import 'package:pet_adoption/ui/widgets/my_body.dart';
 import 'package:pet_adoption/ui/widgets/my_header_title.dart';
@@ -27,10 +30,13 @@ class Home extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     MyHomeAppBar(),
                     SizedBox(height: 20),
-                    MySearchBar(hintText: "Search for a pet"),
+                    MySearchBar(
+                      hintText: "Search for a pet",
+                      onPressed: () => Get.to(() => PetSearchPage(pets: [])),
+                    ),
                   ],
                 ),
               ),
@@ -43,7 +49,6 @@ class Home extends StatelessWidget {
   }
 }
 
-// ───── Reusable Bottom Sheet with Wavy Top ─────
 class _BottomSheetContent extends StatelessWidget {
   const _BottomSheetContent();
 
@@ -59,10 +64,10 @@ class _BottomSheetContent extends StatelessWidget {
           height: MyHelperFunctions.getScreenHeight() * 0.8,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFAF0),
+            color: MyColors.light,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 10,
                 spreadRadius: 2,
               ),
@@ -90,7 +95,6 @@ class _BottomSheetContent extends StatelessWidget {
   }
 }
 
-// ───── Banner Section ─────
 class _BannerCarousel extends StatelessWidget {
   const _BannerCarousel();
 
@@ -167,12 +171,41 @@ class _RecommendedPetsGrid extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         return GestureDetector(
-          onTap: () => Get.to(() => const PetDetails()),
+          onTap: () => Get.to(
+            () => PetDetails(
+              pet: PetsModel(
+                images: [
+                  'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
+                  'https://c8.alamy.com/comp/P6CMJR/a-gray-and-white-domestic-shorthair-cat-with-green-eyes-P6CMJR.jpg',
+                ],
+                name: 'Milo',
+                breed: 'Siamese Cat',
+                gender: 'Male',
+                age: 2,
+                location: 'Alexandria, Egypt',
+                weight: 3.2,
+                isVaccinated: true,
+                characteristics: [
+                  'Friendly',
+                  'Loyal',
+                  'Playful',
+                  'Good with kids',
+                ],
+                createdAt: DateTime.now(),
+                id: "",
+                type: 'Cat',
+                createdBy: "Amr Nabih",
+                isAdopted: false,
+                description:
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+              ),
+            ),
+          ),
           child: PetGridCard(
             isFavorited: false,
             onFavoriteToggle: () {},
             image:
-                'https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg',
+                'https://c8.alamy.com/comp/P6CMJR/a-gray-and-white-domestic-shorthair-cat-with-green-eyes-P6CMJR.jpg',
             name: 'Milo',
             breed: 'Siamese Cat',
             gender: 'Male',

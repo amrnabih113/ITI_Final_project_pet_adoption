@@ -13,28 +13,44 @@ class _CommentsPageState extends State<CommentsPage> {
   final Set<int> _expandedComments = {};
   final TextEditingController _commentController = TextEditingController();
 
-  // Just a dummy function for sending a comment
+  // Track the comment index currently being replied to (null if not replying)
+  int? _replyingToCommentIndex;
+
   void _sendComment() {
     final text = _commentController.text.trim();
-    if (text.isNotEmpty) {
-      // Here you would handle sending the comment, e.g. call API or update state
-      print('Send comment: $text');
-      _commentController.clear();
-      FocusScope.of(context).unfocus(); // close keyboard
-      // Optionally show a toast/snackbar or update UI
+    if (text.isEmpty) return;
+
+    if (_replyingToCommentIndex != null) {
+      print('Replying to comment #$_replyingToCommentIndex: $text');
+      // Handle reply sending logic here (API, state update)
+    } else {
+      print('New comment: $text');
+      // Handle new comment sending logic here
     }
+
+    _commentController.clear();
+    _replyingToCommentIndex = null;
+    FocusScope.of(context).unfocus();
+    setState(() {}); // To update UI and hide reply indicator
   }
 
-  @override
-  void dispose() {
-    _commentController.dispose();
-    super.dispose();
+  void _startReply(int commentIndex) {
+    setState(() {
+      _replyingToCommentIndex = commentIndex;
+    });
+    FocusScope.of(context).requestFocus(FocusNode()); // Open keyboard
+  }
+
+  void _cancelReply() {
+    setState(() {
+      _replyingToCommentIndex = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: const BoxDecoration(
         color: MyColors.light,
         borderRadius: BorderRadius.only(
@@ -43,9 +59,8 @@ class _CommentsPageState extends State<CommentsPage> {
         ),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          // Header Row with title and close button
+          // Header Row
           Row(
             children: [
               Text(
@@ -69,7 +84,6 @@ class _CommentsPageState extends State<CommentsPage> {
 
           const SizedBox(height: 8),
 
-          // Comment list takes remaining space but leaves room for input field
           Expanded(
             child: ListView.separated(
               physics: const BouncingScrollPhysics(),
@@ -88,92 +102,160 @@ class _CommentsPageState extends State<CommentsPage> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-                      leading: CircleAvatar(
-                        radius: 24,
-                        backgroundColor: MyColors.primaryColor.withOpacity(0.1),
-                        backgroundImage: const AssetImage(
-                          'assets/images/profile.png',
-                        ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 0,
+                        vertical: 8,
                       ),
-                      title: Row(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'User ${index + 1}',
-                            style: const TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          const Spacer(),
-                          Text(
-                            '2h ago',
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 12,
+                          // Avatar
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: MyColors.primaryColor.withAlpha(
+                              25,
+                            ),
+                            backgroundImage: const AssetImage(
+                              'assets/images/profile.png',
                             ),
                           ),
-                        ],
-                      ),
-                      subtitle: Text(
-                        'This is a sample comment number ${index + 1}.',
-                        maxLines: 3,
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 14,
-                        ),
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.favorite_border,
-                                color: Colors.grey.shade400,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                likesCount.toString(),
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
+
+                          const SizedBox(width: 12),
+
+                          // Main content: username, time, and comment text
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Username and time row
+                                Row(
+                                  children: [
+                                    Text(
+                                      'User ${index + 1}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      '2h ago',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              Icon(
-                                Icons.comment_outlined,
-                                color: Colors.grey.shade400,
-                                size: 18,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                repliesCount.toString(),
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
+
+                                const SizedBox(height: 4),
+
+                                // Comment text
+                                Text(
+                                  'This is a sample comment number ${index + 1}.',
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (isExpanded) {
-                                  _expandedComments.remove(index);
-                                } else {
-                                  _expandedComments.add(index);
-                                }
-                              });
-                            },
-                            child: Text(
-                              isExpanded ? "Hide replies" : "View replies",
-                              style: TextStyle(
-                                color: MyColors.primaryColor,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12,
-                              ),
+
+                          const SizedBox(width: 12),
+
+                          // Trailing section with reply, likes, replies count, expand/collapse
+                          SizedBox(
+                            width: 80,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => _startReply(index),
+                                  child: Text(
+                                    "Reply",
+                                    style: TextStyle(
+                                      color: MyColors.textPrimary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 6),
+
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 5,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.favorite_border,
+                                          color: Colors.grey.shade400,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          likesCount.toString(),
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.comment_outlined,
+                                          color: Colors.grey.shade400,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          repliesCount.toString(),
+                                          style: TextStyle(
+                                            color: Colors.grey.shade600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 6),
+
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      if (isExpanded) {
+                                        _expandedComments.remove(index);
+                                      } else {
+                                        _expandedComments.add(index);
+                                      }
+                                    });
+                                  },
+                                  child: Text(
+                                    isExpanded
+                                        ? "Hide replies"
+                                        : "View replies",
+                                    style: TextStyle(
+                                      color: MyColors.primaryColor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -199,7 +281,7 @@ class _CommentsPageState extends State<CommentsPage> {
                                   CircleAvatar(
                                     radius: 16,
                                     backgroundColor: MyColors.primaryColor
-                                        .withOpacity(0.1),
+                                        .withValues(alpha: 0.1),
                                     backgroundImage: const AssetImage(
                                       'assets/images/profile.png',
                                     ),
@@ -254,8 +336,35 @@ class _CommentsPageState extends State<CommentsPage> {
             ),
           ),
 
+          // Reply indicator (shown if replying)
+          if (_replyingToCommentIndex != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: MyColors.primaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Replying to User ${_replyingToCommentIndex! + 1}',
+                      style: TextStyle(
+                        color: MyColors.primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _cancelReply,
+                    child: Icon(Icons.close, color: MyColors.primaryColor),
+                  ),
+                ],
+              ),
+            ),
+
           // New comment input field with send button
-          const SizedBox(height: 12),
           Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,

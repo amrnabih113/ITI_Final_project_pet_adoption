@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
+import 'package:pet_adoption/models/pets_model.dart';
+import 'package:pet_adoption/ui/screens/pets/adopt_form.dart';
 import 'package:pet_adoption/ui/widgets/Pet_section_title.dart';
 import 'package:pet_adoption/ui/widgets/icon_button_widget.dart';
 import 'package:pet_adoption/ui/widgets/pet_info_ship.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class PetDetails extends StatelessWidget {
-  const PetDetails({super.key});
+  final PetsModel pet;
+
+  const PetDetails({super.key, required this.pet});
 
   @override
   Widget build(BuildContext context) {
+    final PageController _pageController = PageController();
+
     return Scaffold(
       bottomSheet: BottomSheet(
         backgroundColor: Colors.white70,
@@ -19,7 +28,7 @@ class PetDetails extends StatelessWidget {
           borderRadius: BorderRadius.circular(50),
         ),
         builder: (context) => Container(
-          height: 500,
+          height: 550,
           padding: const EdgeInsets.all(20),
           child: SingleChildScrollView(
             child: Column(
@@ -28,28 +37,33 @@ class PetDetails extends StatelessWidget {
                 // Name + Gender
                 Row(
                   spacing: 8,
-                  children: const [
+                  children: [
                     Text(
-                      'Rocky',
-                      style: TextStyle(
+                      pet.name,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
-                    Icon(Icons.male, color: MyColors.accent, size: 25),
+                    Icon(
+                      pet.gender.toLowerCase() == "male"
+                          ? Icons.male
+                          : Icons.female,
+                      color: MyColors.accent,
+                      size: 25,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 5),
 
                 // Location
                 Row(
-                  children: const [
-                    Icon(Iconsax.location, size: 16, color: Colors.grey),
-                    SizedBox(width: 4),
+                  children: [
+                    const Icon(Iconsax.location, size: 16, color: Colors.grey),
+                    const SizedBox(width: 4),
                     Text(
-                      "Berlin (25 km away)",
-                      style: TextStyle(color: Colors.grey),
+                      pet.location,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -58,51 +72,74 @@ class PetDetails extends StatelessWidget {
                 // Info Chips
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    InfoChip(label: "Samoyed", sub: "Breed"),
-                    InfoChip(label: "Golden", sub: "Color"),
-                    InfoChip(label: "20 Kg", sub: "Weight"),
-                    InfoChip(label: "3 y/o", sub: "Age"),
+                  children: [
+                    InfoChip(label: pet.breed, sub: "Breed"),
+                    InfoChip(label: pet.type, sub: "Type"),
+                    InfoChip(label: "${pet.weight} Kg", sub: "Weight"),
+                    InfoChip(label: "${pet.age} y/o", sub: "Age"),
                   ],
                 ),
                 const SizedBox(height: 20),
 
-                const SizedBox(height: 20),
                 // Health
                 SectionTitle(title: "Health", icon: Iconsax.health),
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(
-                      Iconsax.shield_tick,
+                    Icon(
+                      pet.isVaccinated
+                          ? Iconsax.shield_tick
+                          : Iconsax.shield_cross,
                       size: 18,
-                      color: Colors.green,
+                      color: pet.isVaccinated ? Colors.green : Colors.red,
                     ),
                     const SizedBox(width: 5),
-                    Text("Vaccinated", style: TextStyle(color: Colors.green)),
+                    Text(
+                      pet.isVaccinated ? "Vaccinated" : "Not Vaccinated",
+                      style: TextStyle(
+                        color: pet.isVaccinated ? Colors.green : Colors.red,
+                      ),
+                    ),
                   ],
                 ),
 
                 const SizedBox(height: 20),
-                const CharacteristicsSection(
-                  traits: [
-                    "Good with kids",
-                    "Playful and athletic",
-                    "Requires daily outdoor activity",
-                    "Very empathetic",
-                    "Good with other dogs",
-                  ],
+
+                CharacteristicsSection(traits: pet.characteristics),
+
+                const SizedBox(height: 20),
+
+                // Description
+                SectionTitle(title: "Description", icon: Iconsax.document_text),
+                const SizedBox(height: 6),
+                Text(
+                  pet.description.isNotEmpty
+                      ? pet.description
+                      : "No description available for this pet.",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    height: 1.4,
+                  ),
                 ),
 
                 const SizedBox(height: 30),
-
                 // Adopt Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: pet.isAdopted
+                        ? null
+                        : () {
+                            Get.to(() => AdoptionProcessPage(pet: pet));
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: pet.isAdopted
+                          ? Colors.grey
+                          : MyColors.primaryColor,
+                    ),
                     child: Text(
-                      "Adopt Me",
+                      pet.isAdopted ? "Already Adopted" : "Adopt Me",
                       style: Theme.of(context).textTheme.titleSmall!.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -118,12 +155,50 @@ class PetDetails extends StatelessWidget {
 
       body: Stack(
         children: [
-          // Background Image
-          Image.network(
-            "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-            width: double.infinity,
-            height: 500,
-            fit: BoxFit.cover,
+          Stack(
+            children: [
+              // Swipeable Images
+              SizedBox(
+                height: 450,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: pet.images.isNotEmpty ? pet.images.length : 1,
+                  itemBuilder: (context, index) {
+                    final imageUrl = pet.images.isNotEmpty
+                        ? pet.images[index]
+                        : "https://via.placeholder.com/500x500";
+                    return Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      height: 500,
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
+              ),
+
+              // Page Indicator
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: SmoothPageIndicator(
+                    controller: _pageController,
+                    count: pet.images.isNotEmpty ? pet.images.length : 1,
+                    effect: ExpandingDotsEffect(
+                      activeDotColor: MyColors.primaryColor,
+                      dotColor: MyColors.primaryColor.withValues(
+                        alpha: 0.3,
+                      ), // FIXED
+                      dotHeight: 8,
+                      dotWidth: 8,
+                      expansionFactor: 3,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
 
           // Top buttons
@@ -141,7 +216,9 @@ class PetDetails extends StatelessWidget {
                   IconButtonWidget(
                     icon: Iconsax.heart,
                     iconColor: MyColors.primaryColor,
-                    onTap: () {},
+                    onTap: () {
+                      // Add to favorites logic
+                    },
                   ),
                 ],
               ),
@@ -160,6 +237,9 @@ class CharacteristicsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (traits.isEmpty) {
+      return const Text("No characteristics provided");
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

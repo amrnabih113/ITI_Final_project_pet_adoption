@@ -16,7 +16,7 @@ import 'package:pet_adoption/core/utils/exceptions/platform_exceptions.dart';
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
 import 'package:pet_adoption/ui/screens/auth/login.dart';
 import 'package:pet_adoption/ui/screens/auth/verify_email.dart';
-import 'package:pet_adoption/ui/screens/home_screen.dart';
+import 'package:pet_adoption/ui/screens/navigation_menu.dart';
 import 'package:pet_adoption/ui/screens/onboarding/onboarding.dart';
 
 class AuthService extends GetxController {
@@ -36,7 +36,7 @@ class AuthService extends GetxController {
     if (user != null) {
       if (user.emailVerified) {
         await MyLocalStorage.init(user.uid);
-        Get.offAll(() => const HomeScreen());
+        Get.offAll(() => const NavigationMenu());
       } else {
         Get.offAll(() => VerifyEmailSCreen(email: user.email));
       }

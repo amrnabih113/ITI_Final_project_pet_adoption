@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/core/utils/popups/loaders.dart';
@@ -58,7 +59,6 @@ class _AddPostState extends State<AddPost> {
       return;
     }
 
-
     _postController.clear();
     setState(() {
       _pickedImages.clear();
@@ -88,52 +88,78 @@ class _AddPostState extends State<AddPost> {
           child: Column(
             children: [
               // Display picked images horizontally with remove buttons
-              if (_pickedImages.isNotEmpty)
-                SizedBox(
+              GestureDetector(
+                onTap: _pickImages,
+                child: Container(
                   height: 120,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _pickedImages.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.file(
-                              _pickedImages[index],
-                              width: 120,
-                              height: 120,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 6,
-                            right: 6,
-                            child: GestureDetector(
-                              onTap: () => _removeImage(index),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: const EdgeInsets.all(6),
-                                child: const Icon(
-                                  Icons.close,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: MyColors.light.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: MyColors.primaryColor),
                   ),
+                  child: _pickedImages.isEmpty
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Iconsax.image,
+                              size: 40,
+                              color: MyColors.primaryColor,
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              "Tap to add images",
+                              style: TextStyle(color: MyColors.primaryColor),
+                            ),
+                          ],
+                        )
+                      : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _pickedImages.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.file(
+                                      _pickedImages[index],
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 5,
+                                    right: 5,
+                                    child: GestureDetector(
+                                      onTap: () => _removeImage(index),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: const EdgeInsets.all(6),
+                                        child: const Icon(
+                                          Icons.close,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                 ),
-
-              if (_pickedImages.isNotEmpty) const SizedBox(height: 16),
-
+              ),
+              SizedBox(height: 20),
               // Post content input
               TextField(
                 controller: _postController,
@@ -152,29 +178,9 @@ class _AddPostState extends State<AddPost> {
 
               const SizedBox(height: 16),
 
-              // Pick/change images button
-              ElevatedButton.icon(
-                onPressed: _pickImages,
-                icon: const Icon(Icons.image_outlined),
-                label: const Text("Add Images"),
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  backgroundColor: MyColors.primaryColor,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 20,
-                  ),
-                  textStyle: const TextStyle(fontSize: 16),
-                ),
-              ),
-
-              const Spacer(),
-
               // Submit post button
               SizedBox(
-                width: double.infinity,
+                width: 200,
                 child: ElevatedButton(
                   onPressed: _submitPost,
                   style: ElevatedButton.styleFrom(
@@ -184,7 +190,7 @@ class _AddPostState extends State<AddPost> {
                     ),
                   ),
                   child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: 5),
                     child: Text(
                       "Post",
                       style: TextStyle(
