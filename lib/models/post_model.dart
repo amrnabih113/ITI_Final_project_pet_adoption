@@ -81,6 +81,7 @@ class PostComment extends Equatable {
   final String comment;
   final String userId;
   final List<PostComment> replies;
+  final List<PostLike> likes;
   final String postId;
   final DateTime createdAt;
 
@@ -89,6 +90,7 @@ class PostComment extends Equatable {
     required this.comment,
     required this.userId,
     required this.replies,
+    required this.likes,
     required this.postId,
     required this.createdAt,
   });
@@ -104,6 +106,9 @@ class PostComment extends Equatable {
       replies: List<PostComment>.from(
         json['replies'].map((reply) => PostComment.fromJson(reply)),
       ),
+      likes: List<PostLike>.from(
+        json['likes'].map((like) => PostLike.fromJson(like)),
+      ),
       postId: json['postId'],
       createdAt: DateTime.parse(json['createdAt']),
     );
@@ -115,6 +120,7 @@ class PostComment extends Equatable {
     'userId': userId,
     'replies': replies.map((reply) => reply.toJson()).toList(),
     'postId': postId,
+    'likes': likes.map((like) => like.toJson()).toList(),
     'createdAt': createdAt.toIso8601String(),
   };
 
@@ -124,6 +130,7 @@ class PostComment extends Equatable {
     String? userId,
     List<PostComment>? replies,
     String? postId,
+    List<PostLike>? likes,
     DateTime? createdAt,
   }) {
     return PostComment(
@@ -131,6 +138,7 @@ class PostComment extends Equatable {
       comment: comment ?? this.comment,
       userId: userId ?? this.userId,
       replies: replies ?? this.replies,
+      likes: likes ?? this.likes,
       postId: postId ?? this.postId,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -138,30 +146,19 @@ class PostComment extends Equatable {
 }
 
 class PostLike extends Equatable {
-  
   final String userId;
   final String postId;
 
-  const PostLike({
-  
-    required this.userId,
-    required this.postId,
-  });
+  const PostLike({required this.userId, required this.postId});
 
   @override
-  List<Object?> get props => [ userId, postId];
+  List<Object?> get props => [userId, postId];
 
   factory PostLike.fromJson(Map<String, dynamic> json) {
-    return PostLike(
-      userId: json['userId'],
-      postId: json['postId'],
-    );
+    return PostLike(userId: json['userId'], postId: json['postId']);
   }
 
-  Map<String, dynamic> toJson() => {
-    'userId': userId,
-    'postId': postId,
-  };
+  Map<String, dynamic> toJson() => {'userId': userId, 'postId': postId};
 
   PostLike copyWith({String? id, String? userId, String? postId}) {
     return PostLike(
