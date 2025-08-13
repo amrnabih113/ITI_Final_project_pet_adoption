@@ -1,13 +1,19 @@
-import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pet_adoption/controllers/pets/categories_controller.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
+import 'package:pet_adoption/models/category_model.dart';
+import 'package:pet_adoption/models/pets_model.dart';
 import 'package:pet_adoption/ui/widgets/horizontal_pet_card.dart';
 import 'package:pet_adoption/ui/widgets/my_header_title.dart';
 import 'package:pet_adoption/ui/widgets/pet_card.dart';
 
 class CategoryDetails extends StatelessWidget {
-  const CategoryDetails({super.key});
+  final CategoryModel category;
+  CategoryDetails({super.key, required this.category});
+
+  final CategoriesController controller = CategoriesController.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +28,13 @@ class CategoryDetails extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Dogs",
+              category.name,
               style: Theme.of(
                 context,
               ).textTheme.headlineLarge!.copyWith(color: MyColors.primaryColor),
             ),
             const SizedBox(width: 10),
-            Image.asset("assets/categories/dog.png", width: 40),
+            Image.network(category.image, height: 30, width: 30),
           ],
         ),
         shape: UnderlineInputBorder(
@@ -45,77 +51,59 @@ class CategoryDetails extends StatelessWidget {
             /// ----------- MALE ------------
             MyHeaderTitle(title: "Male", showSeeAll: false),
             const SizedBox(height: 10),
-            CarouselSlider.builder(
-              itemCount: 5,
-              itemBuilder: (context, index, realIdx) {
-                return PetCard(
-                  height: 150,
-                  image:
-                      'https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg',
-                  name: 'Rockey',
-                  breed: 'Golden Retriever',
-                  gender: 'Male',
-                  age: '2 months',
-                  location: 'Cairo, Egypt',
-                  weight: '4.5 kg',
-                  isVaccinated: true,
-                  isFavorited: false,
-                );
-              },
-              options: CarouselOptions(
-                height: 170,
-                enlargeCenterPage: true,
-                enableInfiniteScroll: false,
-                viewportFraction: 0.9,
-                autoPlay: true,
-              ),
-            ),
+            Obx(() {
+              final malePets = controller.pets
+                  .where((pet) => pet.gender == "male")
+                  .toList();
+              return _buildCarousel(malePets);
+            }),
 
             const SizedBox(height: 10),
 
             /// ----------- FEMALE ------------
             MyHeaderTitle(title: "Female", showSeeAll: false),
             const SizedBox(height: 10),
-            CarouselSlider.builder(
-              itemCount: 5,
-              itemBuilder: (context, index, realIdx) {
-                return PetCard(
-                  height: 150,
-                  image:
-                      'https://m.media-amazon.com/images/I/61NGFek9lXL._UF1000,1000_QL80_.jpg',
-                  name: 'Bella',
-                  breed: 'West Highland White Terrier',
-                  gender: 'Female',
-                  age: '2 years',
-                  location: 'Cairo, Egypt',
-                  weight: '4.5 kg',
-                  isVaccinated: true,
-                  isFavorited: false,
-                );
-              },
-              options: CarouselOptions(
-                height: 170,
-                enlargeCenterPage: true,
-                enableInfiniteScroll: false,
-                viewportFraction: 0.9,
-                autoPlay: true,
-              ),
-            ),
+            Obx(() {
+              final femalepets = controller.pets
+                  .where((pet) => pet.gender == "female")
+                  .toList();
+              return _buildCarousel(femalepets);
+            }),
             const SizedBox(height: 10),
 
             /// ----------- ALL ------------
             MyHeaderTitle(title: "Both Genders", showSeeAll: false),
             const SizedBox(height: 10),
-            _buildPetGrid(context, gender: "All"),
+            Obx(() => _buildPetGrid(context, controller.pets)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPetGrid(BuildContext context, {required String gender}) {
+  Widget _buildCarousel(List<PetsModel> petList) {
+    if (petList.isEmpty) {
+      return const Text("No pets available");
+    }
+    return CarouselSlider.builder(
+      itemCount: petList.length,
+      itemBuilder: (context, index, realIdx) {
+        final pet = petList[index];
+        return PetCard(height: 150, pet: pet);
+      },
+      options: CarouselOptions(
+        height: 170,
+        enlargeCenterPage: true,
+        enableInfiniteScroll: false,
+        viewportFraction: 0.9,
+        autoPlay: true,
+      ),
+    );
+  }
+
+  Widget _buildPetGrid(BuildContext context, List<PetsModel> petList) {
     return GridView.builder(
-      itemCount: 10,
+      itemCount: petList.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -123,21 +111,10 @@ class CategoryDetails extends StatelessWidget {
         mainAxisExtent: 280,
       ),
       itemBuilder: (context, index) {
+        final pet = petList[index];
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: PetGridCard(
-            image:
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRscVhVOxfzUsxgnOI1mLsjo2mM4maq7AeQ4g&s',
-            name: 'Max',
-            breed: 'Labrador',
-            gender: 'Male',
-            age: '2 months',
-            location: 'Cairo, Egypt',
-            weight: '4.5 kg',
-            isVaccinated: true,
-            isFavorited: false,
-            onFavoriteToggle: () {},
-          ),
+          child: PetGridCard(pet: pet),
         );
       },
     );

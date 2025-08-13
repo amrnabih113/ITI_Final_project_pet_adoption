@@ -5,8 +5,14 @@ import 'package:pet_adoption/core/constants/colors.dart';
 class MySearchBar extends StatelessWidget {
   final String hintText;
   final VoidCallback? onPressed;
+  final ValueChanged<String>? onChanged;
 
-  const MySearchBar({required this.hintText, this.onPressed, super.key});
+  const MySearchBar({
+    required this.hintText,
+    this.onPressed,
+    this.onChanged,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +20,7 @@ class MySearchBar extends StatelessWidget {
 
     return TextField(
       onTap: onPressed,
+      onChanged: onChanged,
       readOnly:
           onPressed !=
           null, // makes it non-editable if onPressed is set (for navigation)
@@ -59,3 +66,4 @@ class MySearchBar extends StatelessWidget {
     );
   }
 }
+

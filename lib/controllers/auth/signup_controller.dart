@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:pet_adoption/core/utils/helpers/network_manager.dart';
 import 'package:pet_adoption/core/utils/popups/full_screen_loader.dart';
 import 'package:pet_adoption/core/utils/popups/loaders.dart';
+import 'package:pet_adoption/models/user_model.dart';
 import 'package:pet_adoption/services/auth_service.dart';
+import 'package:pet_adoption/services/user_service.dart';
 import 'package:pet_adoption/ui/screens/auth/verify_email.dart';
 
 class SignupController extends GetxController {
@@ -50,10 +52,23 @@ class SignupController extends GetxController {
         MyFullScreenLoader.stopLoading();
         return;
       }
-      await authService.registerWithEmailAndPassword(
+      final userCredential = await authService.registerWithEmailAndPassword(
         emailController.value.text,
         passwordController.value.text,
       );
+      final newUser = UserModel(
+        id: userCredential.user!.uid,
+        email: emailController.value.text.trim(),
+        name:
+            "${fNameController.value.text.trim()} ${lNameController.value.text.trim()}",
+        phoneNumber: phoneController.value.text.trim(),
+        imageUrl: '',
+        joinedAt: DateTime.now(),
+        location: '',
+      );
+
+      final userRepository = Get.put(UserService());
+      await userRepository.saveUserRecord(newUser);
       MyFullScreenLoader.stopLoading();
       Get.to(() => const VerifyEmailSCreen());
       MyLoaders.successSnackBar(
@@ -66,4 +81,5 @@ class SignupController extends GetxController {
       MyFullScreenLoader.stopLoading();
     }
   }
+  
 }

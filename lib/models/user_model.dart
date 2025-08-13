@@ -1,15 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class UserModel extends Equatable {
-  final String id;
-  final String name;
-  final String email;
-  final String imageUrl;
-  final String phoneNumber;
-  final String location;
-  final DateTime joinedAt;
+  String id;
+  String name;
+  String email;
+  String imageUrl;
+  String phoneNumber;
+  String location;
+  DateTime joinedAt;
 
-  const UserModel({
+  UserModel({
     required this.id,
     required this.name,
     required this.email,
@@ -30,16 +31,30 @@ class UserModel extends Equatable {
     joinedAt,
   ];
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-    id: json['id'],
-    name: json['name'],
-    email: json['email'],
-    imageUrl: json['imageUrl'],
-    phoneNumber: json['phoneNumber'],
-    location: json['location'],
-    joinedAt: DateTime.parse(json['joinedAt']),
-  );
+  /// From JSON / Firestore
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    DateTime parsedDate;
 
+    if (json['joinedAt'] is Timestamp) {
+      parsedDate = (json['joinedAt'] as Timestamp).toDate();
+    } else if (json['joinedAt'] is String) {
+      parsedDate = DateTime.parse(json['joinedAt']);
+    } else {
+      parsedDate = DateTime.now();
+    }
+
+    return UserModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
+      location: json['location'] ?? '',
+      joinedAt: parsedDate,
+    );
+  }
+
+  /// To JSON / Firestore
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
@@ -47,9 +62,10 @@ class UserModel extends Equatable {
     'imageUrl': imageUrl,
     'phoneNumber': phoneNumber,
     'location': location,
-    'joinedAt': joinedAt.toIso8601String(),
+    'joinedAt': Timestamp.fromDate(joinedAt),
   };
 
+  /// Copy with modification
   UserModel copyWith({
     String? id,
     String? name,
@@ -58,13 +74,25 @@ class UserModel extends Equatable {
     String? phoneNumber,
     String? location,
     DateTime? joinedAt,
-  }) => UserModel(
-    id: id ?? this.id,
-    name: name ?? this.name,
-    email: email ?? this.email,
-    imageUrl: imageUrl ?? this.imageUrl,
-    phoneNumber: phoneNumber ?? this.phoneNumber,
-    location: location ?? this.location,
-    joinedAt: joinedAt ?? this.joinedAt,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      imageUrl: imageUrl ?? this.imageUrl,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      location: location ?? this.location,
+      joinedAt: joinedAt ?? this.joinedAt,
+    );
+  }
+
+  factory UserModel.empty() => UserModel(
+    id: '',
+    name: '',
+    email: '',
+    imageUrl: '',
+    phoneNumber: '',
+    location: '',
+    joinedAt: DateTime.now(),
   );
 }

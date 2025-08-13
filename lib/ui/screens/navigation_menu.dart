@@ -95,6 +95,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pet_adoption/controllers/auth/user_controller.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/ui/screens/community/community_page.dart';
 import 'package:pet_adoption/ui/screens/pets/explore.dart';
@@ -110,18 +111,24 @@ class NavigationMenu extends StatefulWidget {
 }
 
 class _NavigationMenuState extends State<NavigationMenu> {
-  final _notchController = NotchBottomBarController(index: 0);
+  @override
+  void initState() {
+    super.initState();
+    // Ensure controller is created once
+    Get.put(NavigationController());
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(NavigationController());
-
+    final controller = NavigationController.instance;
+    Get.put(UserController());
     return Scaffold(
       extendBody: true,
       body: Obx(() => controller.screens[controller.selectedIndex.value]),
       bottomNavigationBar: AnimatedNotchBottomBar(
         circleMargin: 0,
-        notchBottomBarController: _notchController,
+
+        notchBottomBarController: controller.notchController.value,
         color: MyColors.light,
         showLabel: false,
         notchColor: MyColors.primaryColor,
@@ -147,12 +154,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
             activeItem: Icon(Iconsax.user, color: MyColors.white),
           ),
         ],
-        onTap: (index) {
-          controller.selectedIndex.value = index;
-          _notchController.index = index;
-        },
+        onTap: controller.changePage,
         kIconSize: 25,
-
         kBottomRadius: 30,
       ),
     );
@@ -160,14 +163,11 @@ class _NavigationMenuState extends State<NavigationMenu> {
 }
 
 class NavigationController extends GetxController {
-  static final NavigationController instance = Get.find();
-  final selectedIndex = 0.obs;
+  // Safe singleton getter
+  static NavigationController get instance => Get.find<NavigationController>();
 
-  @override
-  void onInit() {
-    selectedIndex.value = 0;
-    super.onInit();
-  }
+  final selectedIndex = 0.obs;
+  final notchController = NotchBottomBarController(index: 0).obs;
 
   final List<Widget> screens = [
     Home(),
@@ -176,4 +176,15 @@ class NavigationController extends GetxController {
     FavoritesPage(),
     Profile(),
   ];
+
+  @override
+  void onInit() {
+    selectedIndex.value = 0;
+    super.onInit();
+  }
+
+  void changePage(int index) {
+    selectedIndex.value = index;
+    notchController.value.index = index;
+  }
 }

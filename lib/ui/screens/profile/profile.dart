@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pet_adoption/controllers/auth/user_controller.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/core/utils/helpers/helper_functions.dart';
+import 'package:pet_adoption/repos/animals_data.dart';
 import 'package:pet_adoption/services/auth_service.dart';
+import 'package:pet_adoption/ui/screens/infos/app_info.dart';
+import 'package:pet_adoption/ui/screens/infos/developer_info.dart';
 import 'package:pet_adoption/ui/screens/pets/add_pet.dart';
+import 'package:pet_adoption/ui/screens/pets/my_pets.dart';
 import 'package:pet_adoption/ui/screens/profile/edit_profile.dart';
 import 'package:pet_adoption/ui/widgets/my_body.dart';
+import 'package:pet_adoption/ui/widgets/top_wave_clipper.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -22,7 +28,7 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MyHelperFunctions.getScreenHeight();
-
+    final UserController userController = Get.find();
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -58,9 +64,14 @@ class _ProfileState extends State<Profile> {
                             child: CircleAvatar(
                               backgroundColor: Colors.transparent,
                               radius: 50,
-                              backgroundImage: const AssetImage(
-                                'assets/images/profile.png',
-                              ),
+                              backgroundImage:
+                                  userController.user.value.imageUrl.contains(
+                                    "http",
+                                  )
+                                  ? NetworkImage(
+                                      userController.user.value.imageUrl,
+                                    )
+                                  : AssetImage("assets/images/profile.png"),
                             ),
                           ),
 
@@ -72,7 +83,7 @@ class _ProfileState extends State<Profile> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Amr Nabih',
+                                  userController.user.value.name,
                                   style: TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.bold,
@@ -81,7 +92,7 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'amrnabih112@gmail.com',
+                                  userController.user.value.email,
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: MyColors.textSecondary,
@@ -94,7 +105,7 @@ class _ProfileState extends State<Profile> {
                                   alignment: Alignment.centerLeft,
                                   child: ElevatedButton.icon(
                                     onPressed: () =>
-                                        Get.to(() => const ProfilePage()),
+                                        Get.to(() => ProfilePage()),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: MyColors.primaryColor,
                                       shape: RoundedRectangleBorder(
@@ -152,7 +163,11 @@ class _ProfileState extends State<Profile> {
                           Icons.calendar_month,
                           "My Appointments",
                         ),
-                        _buildSettingTile(Icons.pets_outlined, "My Pets"),
+                        _buildSettingTile(
+                          Icons.pets_outlined,
+                          "My Pets",
+                          onTap: () => Get.to(() => const MyPetsPage()),
+                        ),
                         _buildSwitchTile(
                           Icons.notifications_outlined,
                           "Notifications",
@@ -172,8 +187,21 @@ class _ProfileState extends State<Profile> {
                           Icons.privacy_tip_outlined,
                           "Settings & Privacy",
                         ),
-                        _buildSettingTile(Icons.info_outline, "Developer Info"),
-                        _buildSettingTile(Icons.help_outline, "About Us"),
+                        _buildSettingTile(
+                          Iconsax.document_upload,
+                          "upload data",
+                          onTap: () => uploadData(),
+                        ),
+                        _buildSettingTile(
+                          Icons.info_outline,
+                          "Developer Info",
+                          onTap: () => Get.to(() => const DeveloperInfoPage()),
+                        ),
+                        _buildSettingTile(
+                          Icons.help_outline,
+                          "About Us",
+                          onTap: () => Get.to(() => const AboutAppPage()),
+                        ),
                         _buildSettingTile(
                           Icons.logout,
                           "Log Out",
@@ -247,38 +275,4 @@ class _ProfileState extends State<Profile> {
       ),
     );
   }
-}
-
-class TopWaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.lineTo(0, 40);
-    final firstControlPoint = Offset(size.width / 4, 0);
-    final firstEndPoint = Offset(size.width / 2, 30);
-    final secondControlPoint = Offset(size.width * 3 / 4, 60);
-    final secondEndPoint = Offset(size.width, 40);
-
-    path.quadraticBezierTo(
-      firstControlPoint.dx,
-      firstControlPoint.dy,
-      firstEndPoint.dx,
-      firstEndPoint.dy,
-    );
-    path.quadraticBezierTo(
-      secondControlPoint.dx,
-      secondControlPoint.dy,
-      secondEndPoint.dx,
-      secondEndPoint.dy,
-    );
-
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class StorageService {
+class StorageService extends GetxController {
+  static StorageService get instance => Get.find();
+
   final SupabaseClient _supabase = Supabase.instance.client;
 
   Future<String?> uploadFile({
@@ -43,6 +47,38 @@ class StorageService {
     } catch (e) {
       print("Delete error: $e");
       return false;
+    }
+  }
+
+  Future<String> uploadImage(String path, XFile image) async {
+    try {
+      final response = await Supabase.instance.client.storage
+          .from('users')
+          .list();
+      final exists = response.any((file) {
+        return file.name == path;
+      });
+
+      if (exists) {
+        final publicUrl = Supabase.instance.client.storage
+            .from('users')
+            .getPublicUrl(path);
+        return publicUrl;
+      } else {
+        await Supabase.instance.client.storage
+            .from('users')
+            .upload(path, File(image.path));
+        final publicUrl = Supabase.instance.client.storage
+            .from('users')
+            .getPublicUrl(path);
+        return publicUrl;
+      }
+    } on PostgrestException catch (e) {
+      throw 'Error uploading image: ${e.message}';
+    } on StorageException catch (e) {
+      throw 'Storage error: ${e.message}';
+    } catch (e) {
+      throw "Error uploading image: $e";
     }
   }
 }

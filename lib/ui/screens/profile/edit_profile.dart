@@ -1,43 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:get/get.dart';
+import 'package:pet_adoption/controllers/auth/user_controller.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
+import 'package:pet_adoption/models/user_model.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfilePage extends StatelessWidget {
+  ProfilePage({super.key});
 
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
+  final UserController userController = UserController.instance;
+  final RxBool isEditing = false.obs;
+  final Rx<File?> profileImageFile = Rx<File?>(null);
 
-class _ProfilePageState extends State<ProfilePage> {
-  bool isEditing = false;
-  File? _profileImageFile;
-
-  final _nameController = TextEditingController(text: "Amr Nabih");
-  final _bioController = TextEditingController(
-    text: "Dog lover & volunteer at Cairo Shelter",
-  );
-  final _emailController = TextEditingController(text: "amrNabih@email.com");
-  final _phoneController = TextEditingController(text: "+20 123 456 7890");
-  final _locationController = TextEditingController(text: "Cairo, Egypt");
-
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (pickedFile != null) {
-      setState(() {
-        _profileImageFile = File(pickedFile.path);
-      });
-    }
-  }
-
-  Widget _buildStat(String value, String label) {
+  Widget _buildStat(BuildContext context, String value, String label) {
     return Column(
       children: [
         Text(
@@ -57,35 +33,56 @@ class _ProfilePageState extends State<ProfilePage> {
     String title,
     TextEditingController controller,
   ) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: Icon(icon, color: MyColors.primaryColor),
-        title: Text(
-          title,
-          style: TextStyle(fontWeight: FontWeight.bold, color: MyColors.darker),
-        ),
-        subtitle: isEditing
-            ? TextField(
-                controller: controller,
-                style: TextStyle(color: MyColors.textPrimary),
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  isDense: true,
+    return Obx(
+      () => Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: ListTile(
+          leading: Icon(icon, color: MyColors.primaryColor),
+          title: Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: MyColors.darker,
+            ),
+          ),
+          subtitle: isEditing.value
+              ? TextField(
+                  controller: controller,
+                  style: TextStyle(color: MyColors.textPrimary),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
+                )
+              : Text(
+                  controller.text,
+                  style: TextStyle(color: MyColors.textPrimary),
                 ),
-              )
-            : Text(
-                controller.text,
-                style: TextStyle(color: MyColors.textPrimary),
-              ),
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final nameController = TextEditingController(
+      text: userController.user.value.name,
+    );
+    final emailController = TextEditingController(
+      text: userController.user.value.email,
+    );
+    final bioController = TextEditingController(
+      text: "Dog lover & volunteer at Cairo Shelter",
+    );
+    final phoneController = TextEditingController(
+      text: userController.user.value.phoneNumber,
+    );
+    final locationController = TextEditingController(
+      text: userController.user.value.location,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -109,16 +106,25 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: Icon(
-              isEditing ? Iconsax.tick_square : Iconsax.edit,
-              color: MyColors.textPrimary,
+          Obx(
+            () => IconButton(
+              icon: Icon(
+                isEditing.value ? Iconsax.tick_square : Iconsax.edit,
+                color: MyColors.textPrimary,
+              ),
+              onPressed: () {
+                isEditing.toggle();
+                if (!isEditing.value) {
+                  UserModel userModel = userController.user.value.copyWith(
+                    name: nameController.text,
+                    email: emailController.text,
+                    phoneNumber: phoneController.text,
+                    location: locationController.text,
+                  );
+                  userController.updateUser(userModel);
+                }
+              },
             ),
-            onPressed: () {
-              setState(() {
-                isEditing = !isEditing;
-              });
-            },
           ),
         ],
       ),
@@ -127,83 +133,94 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           children: [
             // Profile Image
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 55,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: _profileImageFile != null
-                      ? FileImage(_profileImageFile!)
-                      : const AssetImage('assets/images/profile.png')
-                            as ImageProvider,
-                ),
-                isEditing
-                    ? Positioned(
-                        bottom: 0,
-                        right: 0,
-
-                        child: Container(
-                          width: 35,
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.zero,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-
-                            color: MyColors.white,
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Iconsax.edit_2,
-                              color: MyColors.primaryColor,
-                              size: 20,
-                            ),
-                            onPressed: _pickImage,
-                          ),
+            Obx(
+              () => Stack(
+                children: [
+                  CircleAvatar(
+                    radius: 55,
+                    backgroundColor: Colors.transparent,
+                    backgroundImage: profileImageFile.value != null
+                        ? FileImage(profileImageFile.value!)
+                        : (userController.user.value.imageUrl.isNotEmpty
+                                  ? NetworkImage(
+                                      userController.user.value.imageUrl,
+                                    )
+                                  : const AssetImage(
+                                      'assets/images/profile.png',
+                                    ))
+                              as ImageProvider,
+                  ),
+                  if (isEditing.value)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 35,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: MyColors.white,
                         ),
-                      )
-                    : const SizedBox.shrink(),
-              ],
+                        child: IconButton(
+                          icon: const Icon(
+                            Iconsax.edit_2,
+                            color: MyColors.primaryColor,
+                            size: 20,
+                          ),
+                          onPressed: () async {
+                            userController.uploadUserProfilePicture();
+                          },
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 12),
 
             // Name Field
-            isEditing
-                ? TextField(
-                    controller: _nameController,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: MyColors.primaryColor,
+            Obx(
+              () => isEditing.value
+                  ? TextField(
+                      controller: nameController,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: MyColors.primaryColor,
+                      ),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    )
+                  : Text(
+                      nameController.text,
+                      style: Theme.of(context).textTheme.headlineSmall!
+                          .copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: MyColors.primaryColor,
+                          ),
                     ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  )
-                : Text(
-                    _nameController.text,
-                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: MyColors.primaryColor,
-                    ),
-                  ),
+            ),
 
             // Bio Field
-            isEditing
-                ? TextField(
-                    controller: _bioController,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: MyColors.textSecondary),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
+            Obx(
+              () => isEditing.value
+                  ? TextField(
+                      controller: bioController,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: MyColors.textSecondary),
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    )
+                  : Text(
+                      bioController.text,
+                      style: TextStyle(color: MyColors.textSecondary),
                     ),
-                  )
-                : Text(
-                    _bioController.text,
-                    style: TextStyle(color: MyColors.textSecondary),
-                  ),
+            ),
 
             const SizedBox(height: 20),
 
@@ -211,17 +228,17 @@ class _ProfilePageState extends State<ProfilePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildStat("3", "Pets Adopted"),
-                _buildStat("12", "Favorites"),
-                _buildStat("8", "Posts"),
+                _buildStat(context, "3", "Pets Adopted"),
+                _buildStat(context, "12", "Favorites"),
+                _buildStat(context, "8", "Posts"),
               ],
             ),
             const SizedBox(height: 20),
 
             // Info Cards
-            _buildInfoCard(Iconsax.location, "Location", _locationController),
-            _buildInfoCard(Iconsax.call, "Phone", _phoneController),
-            _buildInfoCard(Iconsax.sms, "Email", _emailController),
+            _buildInfoCard(Iconsax.location, "Location", locationController),
+            _buildInfoCard(Iconsax.call, "Phone", phoneController),
+            _buildInfoCard(Iconsax.sms, "Email", emailController),
             const SizedBox(height: 40),
           ],
         ),

@@ -1,12 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:pet_adoption/controllers/auth/user_controller.dart';
 import 'package:pet_adoption/core/constants/texts.dart';
 import 'package:pet_adoption/core/utils/helpers/network_manager.dart';
 import 'package:pet_adoption/core/utils/popups/full_screen_loader.dart';
 import 'package:pet_adoption/core/utils/popups/loaders.dart';
 import 'package:pet_adoption/services/auth_service.dart';
-import 'package:pet_adoption/ui/screens/navigation_menu.dart';
+import 'package:pet_adoption/services/user_service.dart';
 
 class SigninController extends GetxController {
   Rx<TextEditingController> emailController = TextEditingController().obs;
@@ -16,7 +17,9 @@ class SigninController extends GetxController {
   RxBool hidePassword = true.obs;
   final GetStorage localStorage = GetStorage();
 
-  final AuthService authService = AuthService.instance;
+  final AuthService authService = Get.put(AuthService());
+  final UserService userService = Get.put(UserService());
+  
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -58,6 +61,7 @@ class SigninController extends GetxController {
         emailController.value.text,
         passwordController.value.text,
       );
+
       MyFullScreenLoader.stopLoading();
       authService.screenRedirect();
     } catch (e) {
@@ -72,7 +76,8 @@ class SigninController extends GetxController {
         "Signing in...",
         "assets/images/loader-animation.json",
       );
-      await authService.signInWithGoogle();
+      final userCredential = await authService.signInWithGoogle();
+      await UserController.instance.saveUserRecord(userCredential);
       MyFullScreenLoader.stopLoading();
       AuthService.instance.screenRedirect();
     } catch (e) {

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pet_adoption/controllers/pets/categories_controller.dart';
+import 'package:pet_adoption/controllers/pets/favourates_controller.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/ui/widgets/category_filter_list.dart';
 import 'package:pet_adoption/ui/widgets/horizontal_pet_card.dart';
@@ -9,7 +12,8 @@ class FavoritesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categories = ['All', 'Dogs', 'Cats', 'Birds', 'Rabbits', 'Turtles'];
+    final categories = CategoriesController.instance.categories;
+    final favouriteController = FavouriteController.instance;
 
     return Scaffold(
       appBar: AppBar(
@@ -30,34 +34,46 @@ class FavoritesPage extends StatelessWidget {
         ),
         toolbarHeight: 70,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            CategoryFilterList(selectedIndex: 0, categories: categories),
-            const SizedBox(height: 20),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 10,
-              separatorBuilder: (context, index) => const SizedBox(height: 20),
-              itemBuilder: (context, index) {
-                return PetCard(
-                  image:
-                      'https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg',
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await favouriteController.fetchAllFavourites();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              CategoryFilterList(categories: categories),
+              const SizedBox(height: 20),
 
-                  name: 'Bella',
-                  breed: 'Golden Retriever',
-                  gender: 'Male',
-                  age: '2 months',
-                  location: 'Cairo, Egypt',
-                  weight: '4.5 kg',
-                  isVaccinated: true,
-                  isFavorited: true,
+              /// Observe filtered pets
+              Obx(() {
+                final pets = favouriteController.filteredFavouritePets;
+
+                if (pets.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 50),
+                    child: Text(
+                      "No favourited pets yet — add some!",
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: pets.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 20),
+                  itemBuilder: (context, index) {
+                    final pet = pets[index];
+                    return PetCard(pet: pet ,);
+                  },
                 );
-              },
-            ),
-          ],
+              }),
+            ],
+          ),
         ),
       ),
     );

@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+/// -----------------------------
+/// POST MODEL
+/// -----------------------------
 class PostModel extends Equatable {
   final String id;
   final String post;
@@ -14,8 +18,8 @@ class PostModel extends Equatable {
     required this.post,
     required this.images,
     required this.userId,
-    required this.likes,
-    required this.comments,
+    this.likes = const [],
+    this.comments = const [],
     required this.createdAt,
   });
 
@@ -42,7 +46,7 @@ class PostModel extends Equatable {
       comments: (json['comments'] as List? ?? [])
           .map((c) => PostComment.fromJson(c))
           .toList(),
-      createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
+      createdAt: _parseDateTime(json['createdAt']),
     );
   }
 
@@ -52,7 +56,7 @@ class PostModel extends Equatable {
     'userId': userId,
     'likes': likes.map((like) => like.toJson()).toList(),
     'comments': comments.map((comment) => comment.toJson()).toList(),
-    'createdAt': createdAt,
+    'createdAt': Timestamp.fromDate(createdAt),
   };
 
   PostModel copyWith({
@@ -76,6 +80,9 @@ class PostModel extends Equatable {
   }
 }
 
+/// -----------------------------
+/// COMMENT MODEL
+/// -----------------------------
 class PostComment extends Equatable {
   final String id;
   final String comment;
@@ -89,28 +96,36 @@ class PostComment extends Equatable {
     required this.id,
     required this.comment,
     required this.userId,
-    required this.replies,
-    required this.likes,
+    this.replies = const [],
+    this.likes = const [],
     required this.postId,
     required this.createdAt,
   });
 
   @override
-  List<Object?> get props => [id, comment, userId, replies, postId, createdAt];
+  List<Object?> get props => [
+    id,
+    comment,
+    userId,
+    replies,
+    likes,
+    postId,
+    createdAt,
+  ];
 
   factory PostComment.fromJson(Map<String, dynamic> json) {
     return PostComment(
-      id: json['id'],
-      comment: json['comment'],
-      userId: json['userId'],
-      replies: List<PostComment>.from(
-        json['replies'].map((reply) => PostComment.fromJson(reply)),
-      ),
-      likes: List<PostLike>.from(
-        json['likes'].map((like) => PostLike.fromJson(like)),
-      ),
-      postId: json['postId'],
-      createdAt: DateTime.parse(json['createdAt']),
+      id: json['id'] ?? '',
+      comment: json['comment'] ?? '',
+      userId: json['userId'] ?? '',
+      replies: (json['replies'] as List? ?? [])
+          .map((reply) => PostComment.fromJson(reply))
+          .toList(),
+      likes: (json['likes'] as List? ?? [])
+          .map((like) => PostLike.fromJson(like))
+          .toList(),
+      postId: json['postId'] ?? '',
+      createdAt: _parseDateTime(json['createdAt']),
     );
   }
 
@@ -121,7 +136,7 @@ class PostComment extends Equatable {
     'replies': replies.map((reply) => reply.toJson()).toList(),
     'postId': postId,
     'likes': likes.map((like) => like.toJson()).toList(),
-    'createdAt': createdAt.toIso8601String(),
+    'createdAt': Timestamp.fromDate(createdAt),
   };
 
   PostComment copyWith({
@@ -129,8 +144,8 @@ class PostComment extends Equatable {
     String? comment,
     String? userId,
     List<PostComment>? replies,
-    String? postId,
     List<PostLike>? likes,
+    String? postId,
     DateTime? createdAt,
   }) {
     return PostComment(
@@ -145,6 +160,9 @@ class PostComment extends Equatable {
   }
 }
 
+/// -----------------------------
+/// LIKE MODEL
+/// -----------------------------
 class PostLike extends Equatable {
   final String userId;
   final String postId;
@@ -155,15 +173,28 @@ class PostLike extends Equatable {
   List<Object?> get props => [userId, postId];
 
   factory PostLike.fromJson(Map<String, dynamic> json) {
-    return PostLike(userId: json['userId'], postId: json['postId']);
+    return PostLike(userId: json['userId'] ?? '', postId: json['postId'] ?? '');
   }
 
   Map<String, dynamic> toJson() => {'userId': userId, 'postId': postId};
 
-  PostLike copyWith({String? id, String? userId, String? postId}) {
+  PostLike copyWith({String? userId, String? postId}) {
     return PostLike(
       userId: userId ?? this.userId,
       postId: postId ?? this.postId,
     );
   }
+}
+
+/// -----------------------------
+/// DATETIME PARSER
+/// -----------------------------
+DateTime _parseDateTime(dynamic value) {
+  if (value == null) return DateTime.now();
+  if (value is Timestamp) return value.toDate();
+  if (value is String) {
+    final parsed = DateTime.tryParse(value);
+    return parsed ?? DateTime.now();
+  }
+  return DateTime.now();
 }

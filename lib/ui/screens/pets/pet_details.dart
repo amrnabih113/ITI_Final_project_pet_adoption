@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 import 'package:pet_adoption/models/pets_model.dart';
 import 'package:pet_adoption/ui/screens/pets/adopt_form.dart';
 import 'package:pet_adoption/ui/widgets/Pet_section_title.dart';
+import 'package:pet_adoption/ui/widgets/favoutare_icon_button.dart';
 import 'package:pet_adoption/ui/widgets/icon_button_widget.dart';
 import 'package:pet_adoption/ui/widgets/pet_info_ship.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -17,7 +17,7 @@ class PetDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PageController _pageController = PageController();
+    final PageController pageController = PageController();
 
     return Scaffold(
       bottomSheet: BottomSheet(
@@ -49,7 +49,9 @@ class PetDetails extends StatelessWidget {
                       pet.gender.toLowerCase() == "male"
                           ? Icons.male
                           : Icons.female,
-                      color: MyColors.accent,
+                      color: pet.gender.toLowerCase() == "male"
+                          ? Colors.blue
+                          : Colors.pink,
                       size: 25,
                     ),
                   ],
@@ -161,7 +163,7 @@ class PetDetails extends StatelessWidget {
               SizedBox(
                 height: 450,
                 child: PageView.builder(
-                  controller: _pageController,
+                  controller: pageController,
                   itemCount: pet.images.isNotEmpty ? pet.images.length : 1,
                   itemBuilder: (context, index) {
                     final imageUrl = pet.images.isNotEmpty
@@ -179,16 +181,16 @@ class PetDetails extends StatelessWidget {
 
               // Page Indicator
               Positioned(
-                bottom: 0,
+                bottom: 80,
                 left: 0,
                 right: 0,
                 child: Center(
                   child: SmoothPageIndicator(
-                    controller: _pageController,
+                    controller: pageController,
                     count: pet.images.isNotEmpty ? pet.images.length : 1,
                     effect: ExpandingDotsEffect(
-                      activeDotColor: MyColors.primaryColor,
-                      dotColor: MyColors.primaryColor.withValues(
+                      activeDotColor: MyColors.secondaryColor,
+                      dotColor: MyColors.secondaryColor.withValues(
                         alpha: 0.3,
                       ), // FIXED
                       dotHeight: 8,
@@ -213,12 +215,11 @@ class PetDetails extends StatelessWidget {
                     icon: Icons.arrow_back,
                     onTap: () => Navigator.pop(context),
                   ),
-                  IconButtonWidget(
-                    icon: Iconsax.heart,
-                    iconColor: MyColors.primaryColor,
-                    onTap: () {
-                      // Add to favorites logic
-                    },
+                  FavoriteIconButton(
+                    petId: pet.id,
+                    initialValue: false,
+                    size: 30,
+                    color: MyColors.primaryColor,
                   ),
                 ],
               ),

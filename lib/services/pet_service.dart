@@ -55,8 +55,15 @@ class PetService extends GetxController {
 
   Future<List<PetsModel>> getFavouratePets(List<String> petsIds) async {
     try {
-      final result = await petsCollection.where('id', whereIn: petsIds).get();
-      return result.docs.map((e) => PetsModel.fromJson(e.data())).toList();
+      if (petsIds.isEmpty) return [];
+      final allPets = await petsCollection
+          .where('id', whereIn: petsIds)
+          .get()
+          .then(
+            (e) => e.docs.map((e) => PetsModel.fromJson(e.data())).toList(),
+          );
+      print("allPets: $allPets");
+      return allPets;
     } on FirebaseAuthException catch (e) {
       throw MyFirebaseAuthException(e.code).message;
     } on FirebaseException catch (e) {
@@ -130,7 +137,7 @@ class PetService extends GetxController {
   Future<List<PetsModel>> getPetsByCategory(String category) async {
     try {
       final result = await petsCollection
-          .where('category', isEqualTo: category)
+          .where('type', isEqualTo: category)
           .get();
       return result.docs.map((e) => PetsModel.fromJson(e.data())).toList();
     } on FirebaseAuthException catch (e) {

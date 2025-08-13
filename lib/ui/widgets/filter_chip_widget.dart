@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
 

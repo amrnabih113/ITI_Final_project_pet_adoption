@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:pet_adoption/controllers/pets/community_controller.dart';
 import 'package:pet_adoption/core/constants/colors.dart';
+import 'package:pet_adoption/models/post_model.dart';
 import 'package:pet_adoption/ui/screens/community/add_post.dart';
 import 'package:pet_adoption/ui/screens/community/comments_page.dart';
 
@@ -11,33 +13,7 @@ class CommunityPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final posts = [
-      {
-        'name': 'Amr Nabih',
-        'avatar': 'assets/images/profile.png',
-        'text': 'Charlie is the cutest dog in the world! 🐾✨',
-        'images': [
-          "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-          "https://www.akc.org/wp-content/uploads/2017/11/Golden-Retriever-running-in-grass.jpg",
-        ],
-        'likes': 128,
-        'comments': 12,
-        'time': '2 hours ago',
-      },
-      {
-        'name': 'Sara Ahmed',
-        'avatar': 'assets/images/profile.png',
-        'text': 'Luna is stealing my snacks again 😂',
-        'images': [
-          'https://www.comfortzone.com/-/media/Project/OneWeb/ComfortZone/Images/Blog/how-can-I-soothe-and-calm-my-cat.jpeg',
-          'https://cdn2.thedogapi.com/images/r1f_ll5VX.jpg',
-          'https://images.unsplash.com/photo-1517423440428-a5a00ad493e8',
-        ],
-        'likes': 203,
-        'comments': 28,
-        'time': '5 hours ago',
-      },
-    ];
+    final controller = Get.put(CommunityController());
 
     return Scaffold(
       appBar: AppBar(
@@ -65,89 +41,114 @@ class CommunityPage extends StatelessWidget {
         actionsPadding: const EdgeInsets.only(right: 10),
         actions: [
           IconButton(
-            icon: Icon(Iconsax.add_square, color: Colors.black),
+            icon: const Icon(Iconsax.add_square, color: Colors.black),
             onPressed: () => Get.to(() => const AddPost()),
           ),
         ],
       ),
-      body: ListView.separated(
-        separatorBuilder: (context, index) =>
-            const Divider(indent: 20, endIndent: 20),
-        itemCount: posts.length,
-        padding: const EdgeInsets.only(
-          top: 12,
-          bottom: 80,
-          left: 10,
-          right: 10,
-        ),
-        itemBuilder: (context, index) {
-          return _buildInstagramPost(posts[index], context);
-        },
-      ),
+      body: Obx(() {
+        return ListView.separated(
+          separatorBuilder: (context, index) =>
+              const Divider(indent: 20, endIndent: 20),
+          itemCount: controller.posts.length,
+          padding: const EdgeInsets.only(
+            top: 12,
+            bottom: 80,
+            left: 10,
+            right: 10,
+          ),
+          itemBuilder: (context, index) {
+            final PostModel post = controller.posts[index];
+            return _buildInstagramPost(post, context);
+          },
+        );
+      }),
     );
   }
 
-  Widget _buildInstagramPost(Map<String, dynamic> post, BuildContext context) {
-    final List<String> images = List<String>.from(post['images']);
+  Widget _buildInstagramPost(PostModel post, BuildContext context) {
+    final List<String> images = post.images;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Post Header
         ListTile(
-          leading: CircleAvatar(
-            backgroundImage: AssetImage(post['avatar']),
-            backgroundColor: MyColors.primaryColor,
+          leading: FutureBuilder(
+            future: CommunityController.instance.getPostUser(post.userId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircleAvatar(backgroundColor: Colors.grey);
+              }
+              if (!snapshot.hasData) {
+                return const CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.person),
+                );
+              }
+              final user = snapshot.data!;
+              return CircleAvatar(
+                backgroundImage: NetworkImage(user.imageUrl),
+                backgroundColor: MyColors.primaryColor,
+              );
+            },
           ),
-          title: Text(
-            post['name'],
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+          title: FutureBuilder(
+            future: CommunityController.instance.getPostUser(post.userId),
+            builder: (context, snapshot) {
+              return Text(
+                snapshot.data?.name ?? "Loading...",
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              );
+            },
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
         ),
 
         const SizedBox(height: 8),
 
-        // Post Images: show horizontally scrollable list if more than one
-        SizedBox(
-          height: 280,
-          child: PageView.builder(
-            itemCount: images.length,
-            controller: PageController(viewportFraction: 0.9),
-            itemBuilder: (context, i) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    images[i],
-                    width: double.infinity,
-                    height: 280,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: progress.expectedTotalBytes != null
-                              ? progress.cumulativeBytesLoaded /
-                                    progress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey.shade300,
-                      alignment: Alignment.center,
-                      child: const Icon(Icons.broken_image, size: 60),
+        // Post Images
+        if (images.isNotEmpty)
+          SizedBox(
+            height: 280,
+            child: PageView.builder(
+              itemCount: images.length,
+              controller: PageController(viewportFraction: 0.9),
+              itemBuilder: (context, i) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      images[i],
+                      width: double.infinity,
+                      height: 280,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: MyColors.primaryColor,
+                            value: progress.expectedTotalBytes != null
+                                ? progress.cumulativeBytesLoaded /
+                                      progress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                      errorBuilder: (_, __, ___) => Container(
+                        color: Colors.grey.shade300,
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.broken_image, size: 60),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
 
         const SizedBox(height: 8),
 
@@ -175,52 +176,7 @@ class CommunityPage extends StatelessWidget {
                 child: const Icon(Icons.chat_bubble_outline, size: 26),
               ),
               const SizedBox(width: 16),
-              InkWell(
-                onTap: () {
-                  showModalBottomSheet(
-                    backgroundColor: MyColors.light,
-                    context: context,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Share Post',
-                              style: Theme.of(context).textTheme.titleLarge!
-                                  .copyWith(color: MyColors.primaryColor),
-                            ),
-                            const SizedBox(height: 16),
-                            ListTile(
-                              leading: const Icon(Icons.link),
-                              title: const Text('Copy Link'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                // Add your copy link logic here
-                              },
-                            ),
-                            ListTile(
-                              leading: const Icon(Icons.share),
-                              title: const Text('Share to...'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                // Add your share logic here
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                child: const Icon(Icons.send_outlined, size: 26),
-              ),
+              const Icon(Icons.send_outlined, size: 26),
               const Spacer(),
               const Icon(Icons.bookmark_border, size: 26),
             ],
@@ -233,7 +189,7 @@ class CommunityPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            '${post['likes']} likes',
+            '${post.likes.length} likes',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -250,13 +206,13 @@ class CommunityPage extends StatelessWidget {
               style: const TextStyle(color: Colors.black),
               children: [
                 TextSpan(
-                  text: post['name'],
+                  text: post.createdAt.toLocal().toString().split(' ')[0],
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const TextSpan(text: '  '),
-                TextSpan(text: post['text']),
+                TextSpan(text: post.post ?? ""),
               ],
             ),
           ),
@@ -268,7 +224,7 @@ class CommunityPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            'View all ${post['comments']} comments',
+            'View all ${post.comments.length} comments',
             style: Theme.of(
               context,
             ).textTheme.labelLarge?.copyWith(color: Colors.grey.shade500),
@@ -281,7 +237,7 @@ class CommunityPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Text(
-            post['time'],
+            _formatTimeAgo(post.createdAt),
             style: Theme.of(
               context,
             ).textTheme.labelLarge?.copyWith(color: Colors.grey.shade500),
@@ -291,5 +247,18 @@ class CommunityPage extends StatelessWidget {
         const SizedBox(height: 16),
       ],
     );
+  }
+
+  String _formatTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes} minutes ago';
+    } else if (difference.inHours < 24) {
+      return '${difference.inHours} hours ago';
+    } else {
+      return '${difference.inDays} days ago';
+    }
   }
 }

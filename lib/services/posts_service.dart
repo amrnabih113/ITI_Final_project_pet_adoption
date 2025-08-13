@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:pet_adoption/core/utils/exceptions/firebase_auth_exceptions.dart';
 import 'package:pet_adoption/core/utils/exceptions/firebase_exceptions.dart';
 import 'package:pet_adoption/core/utils/exceptions/format_exceptions.dart';
@@ -9,7 +10,8 @@ import 'package:pet_adoption/core/utils/exceptions/platform_exceptions.dart';
 import 'package:pet_adoption/core/utils/exceptions/socket_exceptioins.dart';
 import 'package:pet_adoption/models/post_model.dart';
 
-class PostService {
+class PostService extends GetxController{
+  static PostService get instance => Get.find();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> createPost(Map<String, dynamic> postData) async {
